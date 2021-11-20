@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension point="org.modelversioning.emfprofile.profile">
+ 	<profile profile_resource="profiles/ParallelLoop.emfprofile_diagram"/>
+   </extension>
+   <extension point="org.modelversioning.emfprofile.profile">
+    <profile profile_resource="profiles/ForkJoin.emfprofile_diagram"/>
+   </extension>
+   <extension point="org.modelversioning.emfprofile.profile">
+    <profile profile_resource="profiles/ParallelStreams.emfprofile_diagram"/>
+   </extension>
+   <extension point="org.modelversioning.emfprofile.profile">
+    <profile profile_resource="profiles/ScalingPolicy.emfprofile_diagram"/>
+   </extension>
+
+   <extension
+         point="org.eclipse.m2m.qvt.oml.javaBlackboxUnits">
+        <unit
+            name="ProfilesLibrary"
+            namespace="org.palladiosimulator.parallelcatalogue.catalog.black">
+         <library
+               class="org.palladiosimulator.parallelcatalogue.catalog.black.ProfilesLibrary"
+               name="ProfilesLibrary">
+            <metamodel
+                  nsURI="http://www.eclipse.org/emf/2002/Ecore">
+            </metamodel>
+            <metamodel
+                  nsURI="http://www.modelversioning.org/emfprofile/1.1">
+            </metamodel>
+            <metamodel
+                  nsURI="http://www.modelversioning.org/emfprofile/application/1.1">
+            </metamodel>
+            <metamodel
+                  nsURI="http://palladiosimulator.org/PalladioComponentModel/Core/Entity/5.2">
+            </metamodel>
+         </library>
+      </unit>
+   </extension>
+   <extension
+         point="org.palladiosimulator.architecturaltemplates.catalogs">
+      <ATCatalog
+            catalogURI="platform:/plugin/org.palladiosimulator.parallelcatalogue.catalog/ScalingPolicyCatalogue.architecturaltemplates#_dJD3MDJ2Eey7At2OR_gLkg">
+      </ATCatalog>
+   </extension>
+</plugin>

@@ -1,0 +1,121 @@
+import org.palladiosimulator.architecturaltemplates.catalog.black.ProfilesLibrary;
+
+import org.palladiosimulator.simulizar.action.repository.black.SimulationStateLibrary;
+
+//import Loadbalancing;
+
+modeltype ECORE uses 'http://www.eclipse.org/emf/2002/Ecore';
+modeltype PCM_CORE uses 'http://palladiosimulator.org/PalladioComponentModel/Core/5.2';
+modeltype PCM_ENTITY uses 'http://palladiosimulator.org/PalladioComponentModel/Core/Entity/5.2';
+modeltype PCMSEFF uses pcm::seff('http://palladiosimulator.org/PalladioComponentModel/SEFF/5.2');
+modeltype PCMComposition uses pcm::core::composition('http://palladiosimulator.org/PalladioComponentModel/5.2');
+modeltype PCM_COMPLETION uses 'http://palladiosimulator.org/AnalyzerFramework/Completions/1.0';
+modeltype PCMSEFF_PERFORMANCE uses pcm::seff::seff_performance('http://palladiosimulator.org/PalladioComponentModel/SEFF/5.2');
+modeltype PCM_ALLOC uses 'http://palladiosimulator.org/PalladioComponentModel/Allocation/5.2';
+modeltype PCM_Repository uses 'http://palladiosimulator.org/PalladioComponentModel/Repository/5.2';
+modeltype PCM_RESOURCE uses pcm::resourcetype;
+modeltype STOEX uses stoex;
+modeltype PROBFUNC uses probfunction;
+modeltype PCM_COMP uses pcm::core::composition;
+modeltype PCM_SYS uses 'http://palladiosimulator.org/PalladioComponentModel/System/5.2';
+modeltype PCM_RESENV uses pcm::resourceenvironment;
+
+modeltype PRM uses "http://simulizar.palladiosimulator.org/RuntimeMeasurement/1.0";
+	
+/**
+ * Transforms a system where assembly context are annotated with the "Replicable Assembly
+ * Context" AT roles to a PCM instance where each such assembly context can dynamically
+ * horizontal scale. Each replicated assembly context is allocated to a crorrespond
+ * replicated resource container. This resource container has the same specification as
+ * the original container.
+ *
+ * Replication is based on upper and lower thresholds for scaling out and in, respectively.
+ * Such thresholds stick to average response times taken at the component in intervals.
+ * Intervals and thresholds can externally be set via properties.
+ *
+ * TODO How can properties be externally set?
+ * FIXME Copied from the original ThreeLayer completion; did not start further implementation yet :(
+ *
+ * @see http://cloudscale.xlab.si/wiki/index.php/Dynamic_Horizontal_Scaling_CAT
+ *
+ * @author Sebastian Lehrig
+ * @author Daria Giacinto
+ **/
+ 
+ // transform in prm:PRM, wirft alles durcheinander 
+// [Worker-2: Launching New_configuration] ERROR: Transformation job failed
+// [Worker-2: Launching New_configuration] ERROR: code 120: Java method invocation error 'public static boolean org.palladiosimulator.architecturaltemplates.catalog.black.ProfilesLibrary.isProfileApplied(org.eclipse.emf.ecore.EObject,java.lang.String)'
+// Caused by: java.lang.NullPointerException: Cannot invoke "org.eclipse.emf.ecore.EObject.eResource()" because "eObject" is null
+// [Worker-2: Launching New_configuration] ERROR: 	at DynamicHorizontalScalingAssemblyContext::main(ScalingPolicy.qvto:76)
+ 
+transformation DynamicHorizontalScalingAssemblyContext(inout pcmAllocation : PCM_ALLOC)
+extends library SimulationStateLibrary
+extends library ProfilesLibrary
+{
+	//access transformation Loadbalancing;
+	
+	
+//String constants of the DynamicHorizontalScalingAssemblyContext Profile					   			 
+//property dynamicHorizontalScalingAssemblyContextProfile : String = "ScalingPolicyProfile";
+//property dynamicHorizontalScalingAssemblyContextSystemStereotype : String = "ScalingPolicySystem";
+	
+property crprtProfile : String = "ScalingPolicyProfile";
+property crprtStereotype : String = "ScalingPolicySystem";	
+
+property overallResponseTimeMeasurementSpecId: String = '_YPL2EMVuEeiBxvBce3av2w';
+
+property numberOfScaleActions: Integer = 0;
+
+property value: Real = 1110;
+					   
+main() {	
+	//var prms:Set(PRM::RuntimeMeasurement) := prm.objectsOfType(PRM::RuntimeMeasurement);
+
+	log ('Architectural Template Transformation "Dynamic Horizontal Scaling Assembly Context" started');
+	
+	// Get relevant PCM model elements
+	var allocation : Allocation := pcmAllocation.rootObjects()![Allocation];
+	var system : System := allocation.system_Allocation;
+	
+	var alloc:allocation::Allocation := pcmAllocation.rootObjects()->selectOne(temp1:Stdlib::Element|allocation::Allocation);
+	
+	
+	// assert fatal(isProfileApplied(system.oclAsType(EObject), dynamicHorizontalScalingAssemblyContextProfile))
+	//	with log ("The system has no " + dynamicHorizontalScalingAssemblyContextProfile + " applied.");
+		
+	//assert fatal(hasAppliedStereotype(system, dynamicHorizontalScalingAssemblyContextSystemStereotype))
+	//	with log ("The system is not a " + dynamicHorizontalScalingAssemblyContextSystemStereotype + "!");
+	
+	switch {
+		case ((/*ProfilesLibrary.this*/isProfileApplied(system.oclAsType(ECORE::EObject), /*scaleout.this*/crprtProfile) and (/*ProfilesLibrary.this*/hasAppliedStereotype(system, /*scaleout.this*/crprtStereotype)))) do {log('Profile and stereotype found found') };
+		else do {assert fatal (/*ProfilesLibrary.this*/isProfileApplied(system.oclAsType(ECORE::EObject), /*scaleout.this*/crprtProfile)) with log((('The system has no '+(/*scaleout.this*/crprtProfile))+(' applied!'))) };
+	};
+
+	//assert fatal ((prm.rootObjects()->xselect(temp2:Stdlib::Element|PRM::RuntimeMeasurement)->size()>(0))) with log('No Measurements found!');
+	assert fatal ((pcmAllocation.rootObjects()->xselect(temp3:Stdlib::Element|allocation::Allocation)->size()>(0))) with log('Allocation Model is empty!');
+
+	//Set {prms->any(temp4:PRM::RuntimeMeasurement|(temp4.measurementSpecification.id=(/*scaleout.this*/overallResponseTimeMeasurementSpecId)))}->xcollect(temp5:PRM::RuntimeMeasurement|temp5.checkConditionRM());
+
+	var assemblyContexts : Set(AssemblyContext) := system.assemblyContexts__ComposedStructure;
+	
+	assemblyContexts->forEach(comp){
+		comp.entityName:="TestComponent";
+	};		
+
+
+	var newNumberOfReplicas:Integer := 1;
+	//setTaggedValue(pcmAllocation.rootObjects()![Allocation].system_Allocation, newNumberOfReplicas, 'CRPRTPolicy', 'scaledUnits');
+	
+	return null;	
+		
+	// apply loadbalancing profile
+	//if (not isProfileApplied(system, "LoadbalancedProfile")) {
+	//	applyProfile(system, "LoadbalancedProfile");
+	//}
+	
+	// execute loadbalancing completion
+	//new Loadbalancing(pcmAllocation)->transform();
+	log ('Architectural Template Transformation "Dynamic Horizontal Scaling Assembly Context" finished');
+}
+
+}

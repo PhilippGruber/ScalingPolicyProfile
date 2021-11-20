@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ASCII"?>
+<allocation:Allocation xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:allocation="http://palladiosimulator.org/PalladioComponentModel/Allocation/5.2" id="_HaxUwDZmEeyT5bF720YJPw" entityName="New Allocation">
+  <targetResourceEnvironment_Allocation href="newResourceEnvironment.resourceenvironment#/"/>
+  <system_Allocation href="newAssembly.system#_MPFfsDZjEeyT5bF720YJPw"/>
+  <allocationContexts_Allocation id="_LdtlwDZmEeyT5bF720YJPw" entityName="Allocation_Assembly_BasicComponent1">
+    <resourceContainer_AllocationContext href="newResourceEnvironment.resourceenvironment#_LFTXsDZkEeyT5bF720YJPw"/>
+    <assemblyContext_AllocationContext href="newAssembly.system#_OElBsDZjEeyT5bF720YJPw"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_LtXyYDZmEeyT5bF720YJPw" entityName="Allocation_Assembly_BasicComponent12">
+    <resourceContainer_AllocationContext href="newResourceEnvironment.resourceenvironment#_RlS58DZkEeyT5bF720YJPw"/>
+    <assemblyContext_AllocationContext href="newAssembly.system#_St7LYDZjEeyT5bF720YJPw"/>
+  </allocationContexts_Allocation>
+  <allocationContexts_Allocation id="_MUv7cDZmEeyT5bF720YJPw" entityName="Allocation_Assembly_BasicComponent13">
+    <resourceContainer_AllocationContext href="newResourceEnvironment.resourceenvironment#_VJNsoDZkEeyT5bF720YJPw"/>
+    <assemblyContext_AllocationContext href="newAssembly.system#_W9qiQDZjEeyT5bF720YJPw"/>
+  </allocationContexts_Allocation>
+</allocation:Allocation>

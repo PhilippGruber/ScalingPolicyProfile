@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ASCII"?>
+<repository:Repository xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:repository="http://palladiosimulator.org/PalladioComponentModel/Repository/5.2" xmlns:seff="http://palladiosimulator.org/PalladioComponentModel/SEFF/5.2" id="_sP9GEDZhEeyT5bF720YJPw" entityName="New Repository">
+  <components__Repository xsi:type="repository:BasicComponent" id="_ty9w8DZhEeyT5bF720YJPw" entityName="BasicComponent1">
+    <providedRoles_InterfaceProvidingEntity xsi:type="repository:OperationProvidedRole" id="_xzqmQDZhEeyT5bF720YJPw" entityName="BasicComponent1.Interface1.OperationProvidedRole1" providedInterface__OperationProvidedRole="_tBOK8DZhEeyT5bF720YJPw"/>
+    <serviceEffectSpecifications__BasicComponent xsi:type="seff:ResourceDemandingSEFF" id="_xzyiEDZhEeyT5bF720YJPw" describedService__SEFF="_tUXwcDZhEeyT5bF720YJPw">
+      <steps_Behaviour xsi:type="seff:StartAction" id="_xzyiETZhEeyT5bF720YJPw" successor_AbstractAction="_3oY98DZhEeyT5bF720YJPw"/>
+      <steps_Behaviour xsi:type="seff:StopAction" id="_xzyiEjZhEeyT5bF720YJPw" predecessor_AbstractAction="_3oY98DZhEeyT5bF720YJPw"/>
+      <steps_Behaviour xsi:type="seff:InternalAction" id="_3oY98DZhEeyT5bF720YJPw" entityName="InternalAction1" predecessor_AbstractAction="_xzyiETZhEeyT5bF720YJPw" successor_AbstractAction="_xzyiEjZhEeyT5bF720YJPw">
+        <resourceDemand_Action>
+          <specification_ParametericResourceDemand specification="10"/>
+          <requiredResource_ParametricResourceDemand href="pathmap://PCM_MODELS/Palladio.resourcetype#_oro4gG3fEdy4YaaT-RYrLQ"/>
+        </resourceDemand_Action>
+      </steps_Behaviour>
+    </serviceEffectSpecifications__BasicComponent>
+  </components__Repository>
+  <components__Repository xsi:type="repository:BasicComponent" id="_83b1sDZhEeyT5bF720YJPw" entityName="LB">
+    <providedRoles_InterfaceProvidingEntity xsi:type="repository:OperationProvidedRole" id="__eZ38DZhEeyT5bF720YJPw" entityName="LB.Interface1.OperationProvidedRole1" providedInterface__OperationProvidedRole="_tBOK8DZhEeyT5bF720YJPw"/>
+    <requiredRoles_InterfaceRequiringEntity xsi:type="repository:OperationRequiredRole" id="_AypHADZiEeyT5bF720YJPw" entityName="LB.Interface1.OperationRequiredRole1" requiredInterface__OperationRequiredRole="_tBOK8DZhEeyT5bF720YJPw"/>
+    <requiredRoles_InterfaceRequiringEntity xsi:type="repository:OperationRequiredRole" id="_BbFnEDZiEeyT5bF720YJPw" entityName="LB.Interface1.OperationRequiredRole2" requiredInterface__OperationRequiredRole="_tBOK8DZhEeyT5bF720YJPw"/>
+    <requiredRoles_InterfaceRequiringEntity xsi:type="repository:OperationRequiredRole" id="_HQRRwDZiEeyT5bF720YJPw" entityName="LB.Interface1.OperationRequiredRole3" requiredInterface__OperationRequiredRole="_tBOK8DZhEeyT5bF720YJPw"/>
+    <serviceEffectSpecifications__BasicComponent xsi:type="seff:ResourceDemandingSEFF" id="__ehMsDZhEeyT5bF720YJPw" describedService__SEFF="_tUXwcDZhEeyT5bF720YJPw">
+      <steps_Behaviour xsi:type="seff:StartAction" id="__ehMsTZhEeyT5bF720YJPw" successor_AbstractAction="_Czp8gDZiEeyT5bF720YJPw"/>
+      <steps_Behaviour xsi:type="seff:StopAction" id="__ehMsjZhEeyT5bF720YJPw" predecessor_AbstractAction="_Czp8gDZiEeyT5bF720YJPw"/>
+      <steps_Behaviour xsi:type="seff:BranchAction" id="_Czp8gDZiEeyT5bF720YJPw" entityName="BranchAction1" predecessor_AbstractAction="__ehMsTZhEeyT5bF720YJPw" successor_AbstractAction="__ehMsjZhEeyT5bF720YJPw">
+        <branches_Branch xsi:type="seff:ProbabilisticBranchTransition" id="_FAlHEDZiEeyT5bF720YJPw" entityName="ProbabilisticBranchTransition1" branchProbability="0.33333333">
+          <branchBehaviour_BranchTransition id="_FAlHETZiEeyT5bF720YJPw">
+            <steps_Behaviour xsi:type="seff:StartAction" id="_FAlHEjZiEeyT5bF720YJPw" successor_AbstractAction="_KzaoYDZiEeyT5bF720YJPw"/>
+            <steps_Behaviour xsi:type="seff:StopAction" id="_FAlHEzZiEeyT5bF720YJPw" predecessor_AbstractAction="_KzaoYDZiEeyT5bF720YJPw"/>
+            <steps_Behaviour xsi:type="seff:ExternalCallAction" id="_KzaoYDZiEeyT5bF720YJPw" entityName="ExternalCallAction1" predecessor_AbstractAction="_FAlHEjZiEeyT5bF720YJPw" successor_AbstractAction="_FAlHEzZiEeyT5bF720YJPw" calledService_ExternalService="_tUXwcDZhEeyT5bF720YJPw" role_ExternalService="_AypHADZiEeyT5bF720YJPw"/>
+          </branchBehaviour_BranchTransition>
+        </branches_Branch>
+        <branches_Branch xsi:type="seff:ProbabilisticBranchTransition" id="_O5-OEDZiEeyT5bF720YJPw" entityName="ProbabilisticBranchTransition2" branchProbability="0.3333333">
+          <branchBehaviour_BranchTransition id="_O5-OETZiEeyT5bF720YJPw">
+            <steps_Behaviour xsi:type="seff:StartAction" id="_O5-OEjZiEeyT5bF720YJPw" successor_AbstractAction="_Qu3TIDZiEeyT5bF720YJPw"/>
+            <steps_Behaviour xsi:type="seff:StopAction" id="_O5-OEzZiEeyT5bF720YJPw" predecessor_AbstractAction="_Qu3TIDZiEeyT5bF720YJPw"/>
+            <steps_Behaviour xsi:type="seff:ExternalCallAction" id="_Qu3TIDZiEeyT5bF720YJPw" entityName="ExternalCallAction1" predecessor_AbstractAction="_O5-OEjZiEeyT5bF720YJPw" successor_AbstractAction="_O5-OEzZiEeyT5bF720YJPw" calledService_ExternalService="_tUXwcDZhEeyT5bF720YJPw" role_ExternalService="_BbFnEDZiEeyT5bF720YJPw"/>
+          </branchBehaviour_BranchTransition>
+        </branches_Branch>
+        <branches_Branch xsi:type="seff:ProbabilisticBranchTransition" id="_TJdGQDZiEeyT5bF720YJPw" entityName="ProbabilisticBranchTransition3" branchProbability="0.333333">
+          <branchBehaviour_BranchTransition id="_TJdGQTZiEeyT5bF720YJPw">
+            <steps_Behaviour xsi:type="seff:StartAction" id="_TJdGQjZiEeyT5bF720YJPw" successor_AbstractAction="_UVuFEDZiEeyT5bF720YJPw"/>
+            <steps_Behaviour xsi:type="seff:StopAction" id="_TJdGQzZiEeyT5bF720YJPw" predecessor_AbstractAction="_UVuFEDZiEeyT5bF720YJPw"/>
+            <steps_Behaviour xsi:type="seff:ExternalCallAction" id="_UVuFEDZiEeyT5bF720YJPw" entityName="ExternalCallAction1" predecessor_AbstractAction="_TJdGQjZiEeyT5bF720YJPw" successor_AbstractAction="_TJdGQzZiEeyT5bF720YJPw" calledService_ExternalService="_tUXwcDZhEeyT5bF720YJPw" role_ExternalService="_HQRRwDZiEeyT5bF720YJPw"/>
+          </branchBehaviour_BranchTransition>
+        </branches_Branch>
+      </steps_Behaviour>
+    </serviceEffectSpecifications__BasicComponent>
+  </components__Repository>
+  <interfaces__Repository xsi:type="repository:OperationInterface" id="_tBOK8DZhEeyT5bF720YJPw" entityName="Interface1">
+    <signatures__OperationInterface id="_tUXwcDZhEeyT5bF720YJPw" entityName="method1"/>
+  </interfaces__Repository>
+</repository:Repository>

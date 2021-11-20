@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<org.palladiosimulator.edp2.models:MeasuringPointRepository xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:org.palladiosimulator.edp2.models="http://palladiosimulator.org/EDP2/MeasuringPoint/1.0" xmlns:pcmmeasuringpoint="http://palladiosimulator.org/PCM/MeasuringPoint/1.0" id="_uBSHgDZmEeyT5bF720YJPw">
+  <measuringPoints xsi:type="pcmmeasuringpoint:ActiveResourceMeasuringPoint" stringRepresentation="CPU [0] in ResourceContainer1" resourceURIRepresentation="platform:/resource/TestModelProfile/newResourceEnvironment.resourceenvironment#_LxsjoDZkEeyT5bF720YJPw">
+    <activeResource href="newResourceEnvironment.resourceenvironment#_LxsjoDZkEeyT5bF720YJPw"/>
+  </measuringPoints>
+  <measuringPoints xsi:type="pcmmeasuringpoint:ActiveResourceMeasuringPoint" stringRepresentation="CPU [0] in ResourceContainer2" resourceURIRepresentation="platform:/resource/TestModelProfile/newResourceEnvironment.resourceenvironment#_Sdr6gDZkEeyT5bF720YJPw">
+    <activeResource href="newResourceEnvironment.resourceenvironment#_Sdr6gDZkEeyT5bF720YJPw"/>
+  </measuringPoints>
+  <measuringPoints xsi:type="pcmmeasuringpoint:ActiveResourceMeasuringPoint" stringRepresentation="CPU [0] in ResourceContainer3" resourceURIRepresentation="platform:/resource/TestModelProfile/newResourceEnvironment.resourceenvironment#_V0oBIDZkEeyT5bF720YJPw">
+    <activeResource href="newResourceEnvironment.resourceenvironment#_V0oBIDZkEeyT5bF720YJPw"/>
+  </measuringPoints>
+</org.palladiosimulator.edp2.models:MeasuringPointRepository>

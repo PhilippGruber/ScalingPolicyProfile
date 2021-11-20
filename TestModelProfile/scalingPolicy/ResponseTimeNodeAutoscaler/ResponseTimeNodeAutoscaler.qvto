@@ -1,0 +1,322 @@
+/**
+*  This autoscaler scales based on the response time, node wise
+*
+*
+*/
+
+import org.palladiosimulator.simulizar.action.repository.black.SimulationStateLibrary;
+import org.palladiosimulator.architecturaltemplates.catalog.black.ProfilesLibrary;
+
+modeltype ECORE uses "http://www.eclipse.org/emf/2002/Ecore";
+modeltype PRM uses "http://simulizar.palladiosimulator.org/RuntimeMeasurement/1.0";
+modeltype PCM_ALLOC uses "http://palladiosimulator.org/PalladioComponentModel/Allocation/5.2";
+modeltype PCM_SYS uses "http://palladiosimulator.org/PalladioComponentModel/System/5.2";
+modeltype PCM_REP uses "http://palladiosimulator.org/PalladioComponentModel/Repository/5.2";
+modeltype PCM_SEFF uses "http://palladiosimulator.org/PalladioComponentModel/SEFF/5.2";
+
+modeltype PCM_RES_ENV uses 'http://palladiosimulator.org/PalladioComponentModel/ResourceEnvironment/5.2';
+modeltype PCM_ASSEMBLY uses 'http://palladiosimulator.org/PalladioComponentModel/Core/Composition/5.2';
+modeltype SEFF_PERFORMANCE uses 'http://palladiosimulator.org/PalladioComponentModel/SEFF/SEFF_Performance/5.2';
+modeltype PCM_PARAM uses 'http://palladiosimulator.org/PalladioComponentModel/Parameter/5.2';
+modeltype PCM_CORE uses 'http://palladiosimulator.org/PalladioComponentModel/Core/5.2';
+modeltype PCM_SYSTEM uses 'http://palladiosimulator.org/PalladioComponentModel/System/5.2';
+modeltype STOEX uses 'http://sdq.ipd.uka.de/StochasticExpressions/2.2';
+
+
+transformation nodeUtilization( in prm:PRM, inout pcmAllocation:PCM_ALLOC ){
+	
+	// properties 
+	
+
+	// vorerst testweise ueber die response
+	property threshold : Real = 20.0;
+	
+	// ware vielleicht besser die response via ID zu erkennen
+	//property overallResponseTimeMeasurementSpecId: String = '_YPL2EMVuEeiBxvBce3av2w';
+	
+
+	// brauche ich das?
+	// policy tagged values
+	//property scaledUnitsTaggedValue: String = 'scaledUnits';
+	//property lastScalingDecisionTagged : String =  "lastScalingDecision";
+	
+	property numberOfScaleActions: Integer = 0;
+	
+	// constraints 
+	// MAX NUMBER OF REPLICAS
+	property boundedNumberOfResourceContainers : Integer = 4;
+	// Duration COOLDOWN SCALE OUT
+	property quiescencePeriod : EDouble = 120;
+	
+	main(){
+	
+		log('Transformation rule [NodeUtilization] started ...');
+		
+		assert fatal(prm.rootObjects()[RuntimeMeasurement]->size() > 0)
+			with log ("No Measurements found!");
+		
+		assert fatal(pcmAllocation.rootObjects()[Allocation]->size() > 0)
+		with log ("Allocation Model is empty!");
+		
+		prm.rootObjects()[RuntimeMeasurement]->checkCondition();
+	
+		log('Transformation rule [NodeUtilization] DONE.');
+	}
+	
+	
+	helper Set(RuntimeMeasurement) :: checkCondition() : Boolean {
+	
+		self->forEach(measurement) {
+		log('Measured value is ' + measurement.measuringValue.toString());
+		
+		// var lastScaleDecision : EDouble := getDoubleTaggedValue(system,lastScalingDecisionTagged,crpuStereotype);
+		// if(getSimulationTime() > lastScaleDecision+quiescencePeriod)
+		
+			if (measurement.measuringValue > threshold) {
+				pcmAllocation.rootObjects()[Allocation]->forAll(
+					allocation : Allocation | 
+					scaleUp(allocation.allocationContexts_Allocation)
+				);
+				return true;
+			}
+			elif (measurement.measuringValue < threshold){
+				pcmAllocation.rootObjects()[Allocation]->forAll(
+					allocation : Allocation | 
+					scaleDown(allocation.allocationContexts_Allocation)
+				);
+				return true;
+			};
+	    }; 
+	    
+		log('No measurements match the condition. Number of measurements is ' + self->size().toString());
+		return false;
+	}
+	
+	helper scaleUp(allocationContexts : Set(AllocationContext)) : Boolean {
+			
+		/**
+		 * This implements a scale down action, from equal branch probability of 0.5 to both servers, it shifts to 1. 
+		 * That results in only one "server" used instead of two. 
+		 * 
+		 * Here for all SEFF that are "implemented", that which are not yet defined are missing (e.g. data provider)
+		 * 
+		 * TODO scale in and maybe a bit more advanced logic 
+		 */
+	
+		// Anzahl an Context innerhalb des Allocation models
+		log('Found ' +  allocationContexts->size().toString() + ' AllocationContexts');
+		
+		allocationContexts->forEach(allocation){
+
+			// LoadBalancer in the system diagram
+			if( allocation.assemblyContext_AllocationContext.id = "_S09fACvEEeyi2P3_6YumpA" ) {
+			log('found load balancer: AC_LoadBalancer');
+				allocation.assemblyContext_AllocationContext.encapsulatedComponent__AssemblyContext.oclAsType(BasicComponent).serviceEffectSpecifications__BasicComponent->forEach(seff) {
+					if(seff.oclIsTypeOf(ResourceDemandingSEFF)) {
+						
+						/**
+						 * Does it for send TelemetryData (Dervice Com)
+						 */
+						
+						//name of branch: delegateToServer2
+						var branch2 : ProbabilisticBranchTransition = seff.allSubobjects()[ProbabilisticBranchTransition]->any(id="_w9V5wCvCEeyi2P3_6YumpA");
+						if(branch2.branchProbability = 0.0) {
+						//if(branch2.branchProbability > 0.0) {
+							// below unrecognized var outsourceFactor
+						//	branch2.branchProbability := 0.0;
+							branch2.branchProbability := 0.5;
+							log('Set branchProbability to ' + branch2.branchProbability.toString());
+							return true;
+						};
+						//name of branch: delegateToServer1
+						var branch1 : ProbabilisticBranchTransition = seff.allSubobjects()[ProbabilisticBranchTransition]->any(id="_wkxBsCvCEeyi2P3_6YumpA");
+						if(branch1.branchProbability = 1.0) {
+						//if(branch1.branchProbability < 1.0) {
+							// below unrecognized var outsourceFactor
+						//	branch1.branchProbability := 1.0;
+							branch1.branchProbability := 0.5;
+							log('Set branchProbability to ' + branch1.branchProbability.toString());
+							return true;
+						};
+						
+						/**
+						 * Does it for set online (Dervice Com)
+						 */
+						
+						//name of branch: delegateToServer2
+						var branch22 : ProbabilisticBranchTransition = seff.allSubobjects()[ProbabilisticBranchTransition]->any(id="_dJMmICxMEeyw-cCjs3YUYw");
+						if(branch22.branchProbability = 0.0) {
+							
+							branch22.branchProbability := 0.5;
+							log('Set branchProbability to ' + branch22.branchProbability.toString());
+							return true;
+						};
+						//name of branch: delegateToServer1
+						var branch11 : ProbabilisticBranchTransition = seff.allSubobjects()[ProbabilisticBranchTransition]->any(id="_BNzSQCxMEeyw-cCjs3YUYw");
+						if(branch11.branchProbability = 1.0) {
+							
+							branch11.branchProbability := 0.5;
+							log('Set branchProbability to ' + branch11.branchProbability.toString());
+							return true;
+						};
+						
+						/**
+						 * Does it for on conversion request (Processing)
+						 */
+						
+						//name of branch: delegateToServer2
+						var branch222 : ProbabilisticBranchTransition = seff.allSubobjects()[ProbabilisticBranchTransition]->any(id="_kz9igCyFEeyw-cCjs3YUYw");
+						if(branch222.branchProbability = 0.0) {
+							
+							branch222.branchProbability := 0.5;
+							log('Set branchProbability to ' + branch222.branchProbability.toString());
+							return true;
+						};
+						//name of branch: delegateToServer1
+						var branch111 : ProbabilisticBranchTransition = seff.allSubobjects()[ProbabilisticBranchTransition]->any(id="_igBJ8CyFEeyw-cCjs3YUYw");
+						if(branch111.branchProbability = 1.0) {
+							
+							branch111.branchProbability := 0.5;
+							log('Set branchProbability to ' + branch111.branchProbability.toString());
+							return true;
+						};
+						
+						/**
+						 * Does it for on data available (Processing)
+						 */
+						
+						//name of branch: delegateToServer2
+						var branch2222 : ProbabilisticBranchTransition = seff.allSubobjects()[ProbabilisticBranchTransition]->any(id="_TylIUCyJEeyw-cCjs3YUYw");
+						if(branch2222.branchProbability = 0.0) {
+							
+							branch2222.branchProbability := 0.5;
+							log('Set branchProbability to ' + branch2222.branchProbability.toString());
+							return true;
+						};
+						//name of branch: delegateToServer1
+						var branch1111 : ProbabilisticBranchTransition = seff.allSubobjects()[ProbabilisticBranchTransition]->any(id="_KyHNYCyJEeyw-cCjs3YUYw");
+						if(branch1111.branchProbability = 1.0) {
+							
+							branch1111.branchProbability := 0.5;
+							log('Set branchProbability to ' + branch1111.branchProbability.toString());
+							return true;
+						};
+						
+					}
+				}
+			}
+		};
+		
+		return false;
+	}
+	
+	
+	helper scaleDown(allocationContexts : Set(AllocationContext)) : Boolean {
+		// Anzahl an Context innerhalb des Allocation models
+		log('Found ' +  allocationContexts->size().toString() + ' AllocationContexts');
+		
+		allocationContexts->forEach(allocation){
+
+			// LoadBalancer in the system diagram
+			if( allocation.assemblyContext_AllocationContext.id = "_S09fACvEEeyi2P3_6YumpA" ) {
+			log('found load balancer: AC_LoadBalancer');
+				allocation.assemblyContext_AllocationContext.encapsulatedComponent__AssemblyContext.oclAsType(BasicComponent).serviceEffectSpecifications__BasicComponent->forEach(seff) {
+					if(seff.oclIsTypeOf(ResourceDemandingSEFF)) {
+						
+						/**
+						 * Does it for send TelemetryData (Dervice Com)
+						 */
+						
+						//name of branch: delegateToServer2
+						var branch2 : ProbabilisticBranchTransition = seff.allSubobjects()[ProbabilisticBranchTransition]->any(id="_w9V5wCvCEeyi2P3_6YumpA");
+						if(branch2.branchProbability > 0.0) {
+							
+							branch2.branchProbability := 0.0;
+							
+							log('Set branchProbability to ' + branch2.branchProbability.toString());
+							return true;
+						};
+						//name of branch: delegateToServer1
+						var branch1 : ProbabilisticBranchTransition = seff.allSubobjects()[ProbabilisticBranchTransition]->any(id="_wkxBsCvCEeyi2P3_6YumpA");
+						if(branch1.branchProbability < 1.0) {
+							
+							branch1.branchProbability := 1.0;
+						
+							log('Set branchProbability to ' + branch1.branchProbability.toString());
+							return true;
+						};
+						
+						/**
+						 * Does it for set online (Dervice Com)
+						 */
+						
+						//name of branch: delegateToServer2
+						var branch22 : ProbabilisticBranchTransition = seff.allSubobjects()[ProbabilisticBranchTransition]->any(id="_dJMmICxMEeyw-cCjs3YUYw");
+						if(branch22.branchProbability > 0.0) {
+							
+							branch22.branchProbability := 0.0;
+							log('Set branchProbability to ' + branch22.branchProbability.toString());
+							return true;
+						};
+						//name of branch: delegateToServer1
+						var branch11 : ProbabilisticBranchTransition = seff.allSubobjects()[ProbabilisticBranchTransition]->any(id="_BNzSQCxMEeyw-cCjs3YUYw");
+						if(branch11.branchProbability < 1.0) {
+							
+							branch11.branchProbability := 1.0;
+							log('Set branchProbability to ' + branch11.branchProbability.toString());
+							return true;
+						};
+						
+						/**
+						 * Does it for on conversion request (Processing)
+						 */
+						
+						//name of branch: delegateToServer2
+						var branch222 : ProbabilisticBranchTransition = seff.allSubobjects()[ProbabilisticBranchTransition]->any(id="_kz9igCyFEeyw-cCjs3YUYw");
+						if(branch222.branchProbability > 0.0) {
+							
+							branch222.branchProbability := 0.0;
+							log('Set branchProbability to ' + branch222.branchProbability.toString());
+							return true;
+						};
+						//name of branch: delegateToServer1
+						var branch111 : ProbabilisticBranchTransition = seff.allSubobjects()[ProbabilisticBranchTransition]->any(id="_igBJ8CyFEeyw-cCjs3YUYw");
+						if(branch111.branchProbability > 1.0) {
+							
+							branch111.branchProbability := 1.0;
+							log('Set branchProbability to ' + branch111.branchProbability.toString());
+							return true;
+						};
+						
+						/**
+						 * Does it for on data available (Processing)
+						 */
+						
+						//name of branch: delegateToServer2
+						var branch2222 : ProbabilisticBranchTransition = seff.allSubobjects()[ProbabilisticBranchTransition]->any(id="_TylIUCyJEeyw-cCjs3YUYw");
+						if(branch2222.branchProbability > 0.0) {
+							
+							branch2222.branchProbability := 0.0;
+							log('Set branchProbability to ' + branch2222.branchProbability.toString());
+							return true;
+						};
+						//name of branch: delegateToServer1
+						var branch1111 : ProbabilisticBranchTransition = seff.allSubobjects()[ProbabilisticBranchTransition]->any(id="_KyHNYCyJEeyw-cCjs3YUYw");
+						if(branch1111.branchProbability > 1.0) {
+							
+							branch1111.branchProbability := 1.0;
+							log('Set branchProbability to ' + branch1111.branchProbability.toString());
+							return true;
+						};
+						
+					}
+				}
+			}
+		};
+	
+		return false;
+	}
+	
+	
+}
+
